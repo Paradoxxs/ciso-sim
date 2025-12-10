@@ -1,0 +1,285 @@
+id: hybrid-idp-breach
+name: Identity Provider Drift & Lateral Spread
+briefing: >
+  Your organization runs a hybrid cloud environment using a centralized IdP.
+  A misconfigured legacy trust policy allowed a contractor’s device to grant excessive roles
+  in the cloud tenancy. Suspicious privilege escalation attempts are now being observed.
+starting_stage: detect
+stages:
+  - id: detect
+    title: Detection & Verification
+    summary: Identity logs show unauthorized role creation events and anomalous access attempts across regions.
+    challenges:
+      - id: idp-log-gaps
+        title: Validate the signal
+        prompt: Identity logs are inconsistent due to misaligned retention settings. You need verification quickly.
+        options:
+          - id: enable-emergency-idp-logging
+            label: Enable emergency high-fidelity identity logging
+            narrative: Temporarily enable verbose logging for authentication, token issuance, and STS events.
+            outcome:
+              description: High-quality evidence is captured, but costs spike.
+              budget_delta: -6
+              reputation_delta: 1
+              risk_delta: -6
+              next_stage: contain
+              skill: engineering
+          - id: rely-cloudtrail
+            label: Rely on CloudTrail/Activity Logs
+            narrative: Use cloud-native logs to reconstruct access sequences with limited identity context.
+            outcome:
+              description: Basic visibility restored, but attribution is weaker.
+              budget_delta: -2
+              reputation_delta: 0
+              risk_delta: -2
+              next_stage: contain
+              skill: analysis
+      - id: contractor-scope
+        title: Scope contractor impact
+        prompt: Security governance wants to know how far the contractor’s account could have spread.
+        options:
+          - id: graph-analysis
+            label: Perform privilege graph analysis
+            narrative: Use IAM graphing to map effective permissions and attack paths.
+            outcome:
+              description: Attack routes are identified quickly; engineering is impressed.
+              budget_delta: -4
+              reputation_delta: 3
+              risk_delta: -5
+              next_stage: contain
+              skill: analysis
+          - id: manual-review
+            label: Manually review role trust policies
+            narrative: Pull JSON policy files from repositories and review line-by-line.
+            outcome:
+              description: Slow but accurate; detection window widens for adversary.
+              budget_delta: -1
+              reputation_delta: -1
+              risk_delta: 4
+              next_stage: contain
+              skill: engineering
+
+  - id: contain
+    title: Containment
+    summary: Unauthorized identities and shadow trust relationships are uncovered. Business units demand uninterrupted access.
+    challenges:
+      - id: trust-policy-fix
+        title: Trust boundary correction
+        prompt: Legacy cross-account trust is still active.
+        options:
+          - id: revoke-trust
+            label: Revoke all outdated trust relationships
+            narrative: Remove stale trust links and force new sessions to re-authenticate.
+            outcome:
+              description: Stops attacker movement cold but breaks several automations.
+              budget_delta: -5
+              reputation_delta: 1
+              risk_delta: -7
+              next_stage: eradicate
+              skill: engineering
+          - id: scoped-down
+            label: Scope-down rewriting only
+            narrative: Rewrite high-risk trust policies while leaving low-risk ones in place.
+            outcome:
+              description: Reduces risk moderately with less disruption.
+              budget_delta: -3
+              reputation_delta: 0
+              risk_delta: -3
+              next_stage: eradicate
+              skill: engineering
+      - id: contractor-identity-cut
+        title: Contractor account isolation
+        prompt: Contractor's laptop is possibly compromised.
+        options:
+          - id: full-disable
+            label: Disable all contractor identities immediately
+            narrative: Suspend accounts and invalidate all tokens and refresh sessions.
+            outcome:
+              description: Risk drops sharply; vendor PM escalates to your CIO.
+              budget_delta: -4
+              reputation_delta: -1
+              risk_delta: -8
+              next_stage: eradicate
+              skill: leadership
+          - id: partial-restriction
+            label: Restrict to monitored sandbox roles
+            narrative: Move accounts to non-privileged roles while monitoring.
+            outcome:
+              description: Contractor continues limited work; attacker may still pivot.
+              budget_delta: -1
+              reputation_delta: 1
+              risk_delta: -2
+              next_stage: eradicate
+              skill: comms
+
+  - id: eradicate
+    title: Eradication
+    summary: Compromised roles and tokens are being unwound. Security architects push for Zero Trust guardrail reforms.
+    challenges:
+      - id: iam-hardening
+        title: IAM hardening
+        prompt: You discover multiple roles with unused but powerful permissions.
+        options:
+          - id: prune-permissions
+            label: Permission pruning project
+            narrative: Remove unused permissions and enforce least-privilege baselines.
+            outcome:
+              description: Identity posture improves dramatically; developers complain loudly.
+              budget_delta: -7
+              reputation_delta: 1
+              risk_delta: -9
+              next_stage: recover
+              skill: engineering
+          - id: monitor-iam
+            label: Monitor IAM for anomalies instead
+            narrative: Leave roles intact but instrument detections and alerts.
+            outcome:
+              description: Some attacks detected, but latent risk remains.
+              budget_delta: -2
+              reputation_delta: 0
+              risk_delta: -3
+              next_stage: recover
+              skill: analysis
+      - id: hybrid-refresh
+        title: Hybrid identity refresh
+        prompt: On-premises directory sync policies may have replicated excessive privileges to cloud.
+        options:
+          - id: reset-sync-rules
+            label: Rebuild directory sync rules
+            narrative: Harden attribute mappings, group memberships, and sync frequency.
+            outcome:
+              description: Environment becomes cleaner but requires downtime.
+              budget_delta: -6
+              reputation_delta: -1
+              risk_delta: -7
+              next_stage: recover
+              skill: engineering
+          - id: add-conditional-access
+            label: Add Conditional Access controls first
+            narrative: Add device trust, network context, and step-up auth to constrain misuse.
+            outcome:
+              description: Stronger protection with minimal disruption.
+              budget_delta: -3
+              reputation_delta: 2
+              risk_delta: -4
+              next_stage: recover
+              skill: engineering
+
+  - id: recover
+    title: Recovery & Zero Trust Governance
+    summary: Executives demand assurance that identity boundaries are now resilient.
+    challenges:
+      - id: exec-update
+        title: Executive brief
+        prompt: What message do you give the executive team?
+        options:
+          - id: structured-brief
+            label: Structured risk-focused update
+            narrative: Present root cause, control gaps, and Zero Trust guardrail roadmap.
+            outcome:
+              description: Trust improves; board expects faster ZT adoption.
+              budget_delta: -2
+              reputation_delta: 5
+              risk_delta: -4
+              skill: comms
+          - id: minimized-brief
+            label: Minimize detail to avoid panic
+            narrative: Provide high-level context with vague technical references.
+            outcome:
+              description: Short-term calm; later scrutiny hits credibility.
+              budget_delta: -1
+              reputation_delta: -4
+              risk_delta: 3
+              skill: leadership
+      - id: audit-package
+        title: Internal audit follow-up
+        prompt: Internal audit demands documentation and a maturity assessment.
+        options:
+          - id: full-assessment
+            label: Provide full Zero Trust maturity review
+            narrative: Work with audit to document identity, access, and logging controls.
+            outcome:
+              description: High transparency strengthens governance; costs increase.
+              budget_delta: -5
+              reputation_delta: 3
+              risk_delta: -3
+              skill: comms
+          - id: phased-assessment
+            label: Provide partial findings now
+            narrative: Deliver quick wins and defer deeper maturity scoring.
+            outcome:
+              description: Buys time; audit schedules more aggressive follow-ups.
+              budget_delta: -1
+              reputation_delta: -2
+              risk_delta: 1
+              skill: comms
+
+injections:
+  - id: shadow-it
+    title: Shadow IT discovery
+    prompt: Infra team reveals an unsanctioned cloud account peered to production.
+    options:
+      - id: immediate-sever
+        label: Sever peer link immediately
+        narrative: Cut VPC/VNet peering and block routes.
+        outcome:
+          description: Attack surface collapses; DevOps anger spikes.
+          budget_delta: -2
+          reputation_delta: -1
+          risk_delta: -4
+          skill: engineering
+      - id: staged-removal
+        label: Stage removal with DevOps coordination
+        narrative: Plan de-peering over 48 hours while gathering asset inventory.
+        outcome:
+          description: More orderly, but leaves temporary exposure.
+          budget_delta: -1
+          reputation_delta: 1
+          risk_delta: 2
+          skill: comms
+
+  - id: token-dump
+    title: Token dump on code repo
+    prompt: Security scanners find exposed access tokens in historical commits.
+    options:
+      - id: mass-rotate
+        label: Immediate mass token rotation
+        narrative: Revoke and regenerate all affected tokens and secrets.
+        outcome:
+          description: Strong security outcome; operations scramble.
+          budget_delta: -4
+          reputation_delta: 0
+          risk_delta: -6
+          skill: engineering
+      - id: risk-tiered-rotation
+        label: Tiered rotation by risk level
+        narrative: Rotate high-risk tokens now and stage the rest.
+        outcome:
+          description: Balanced approach; residual threat persists.
+          budget_delta: -1
+          reputation_delta: 1
+          risk_delta: -2
+          skill: analysis
+
+  - id: idp-outage
+    title: IdP outage
+    prompt: Identity provider experiences intermittent outages during incident response.
+    options:
+      - id: failover-idp
+        label: Activate failover IdP
+        narrative: Switch authentication to backup identity stack with limited features.
+        outcome:
+          description: Authentication restored; logging becomes partially degraded.
+          budget_delta: -3
+          reputation_delta: 0
+          risk_delta: -2
+          skill: engineering
+      - id: auth-throttling
+        label: Throttle authentication requests
+        narrative: Restrict non-critical authentication flows to preserve core services.
+        outcome:
+          description: Business impact minimized; response teams work under load.
+          budget_delta: -1
+          reputation_delta: 0
+          risk_delta: 1
+          skill: leadership

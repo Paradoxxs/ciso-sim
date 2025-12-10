@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Launch Simulation{% endblock %}
+
+{% block content %}
+  <section class="layout">
+    <aside class="scenario-panel">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="scenario-tab">Scenario</button>
+        <button class="tab-btn" data-tab="team-tab">Team</button>
+      </div>
+
+      <div id="scenario-tab" class="tab-panel active">
+        <h2>Select a scenario</h2>
+        <form id="scenario-form">
+          <label for="scenario">Scenario</label>
+          <select id="scenario" name="scenario_id" required>
+            <option value="" selected disabled>Pick a scenario</option>
+            {% for scenario in scenarios %}
+              <option value="{{ scenario.id }}" data-briefing="{{ scenario.briefing|e }}">{{ scenario.name }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit">Launch</button>
+        </form>
+        <article id="briefing" class="briefing">
+          <h3>Briefing</h3>
+          <p>Select a scenario to review the briefing.</p>
+        </article>
+      </div>
+
+      <div id="team-tab" class="tab-panel">
+        <h2>Build your team</h2>
+        <p>Budget: <span id="team-total">0</span>/<span id="team-budget">0</span></p>
+        <div id="roster" class="roster-grid"></div>
+      </div>
+    </aside>
+    <section class="game-panel">
+      <div id="status-panel" class="status">
+        <div>
+          <h3>Budget</h3>
+          <span id="budget-value">-</span>
+        </div>
+        <div>
+          <h3>Reputation</h3>
+          <span id="reputation-value">-</span>
+        </div>
+        <div>
+          <h3>Risk</h3>
+          <span id="risk-value">-</span>
+        </div>
+      </div>
+      <div id="team-stats" class="team-stats"></div>
+      <div id="stage-panel">
+        <p class="placeholder">Start a session to see decision prompts.</p>
+      </div>
+      <div id="history-panel">
+        <h3>History</h3>
+        <ul id="history"></ul>
+      </div>
+    </section>
+  </section>
+{% endblock %}
+

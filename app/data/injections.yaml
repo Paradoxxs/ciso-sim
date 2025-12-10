@@ -1,0 +1,87 @@
+id: injection
+name: injection
+injections:
+  - id: SIEM-goes-down
+    title: SIEM goes down
+    prompt: No SIEM for you!
+    options:
+      - id: block-domains
+        label: Block lookalike domains and warn staff
+        narrative: Update mail filters and send urgent comms.
+        outcome:
+          description: Reduces clicks; minor disruption to legit mail.
+          budget_delta: -2
+          reputation_delta: 1
+          risk_delta: -3
+          skill: comms
+      - id: monitor-only
+        label: Monitor before blocking
+        narrative: Collect samples to improve detections first.
+        outcome:
+          description: Gains intel but some users click.
+          budget_delta: 0
+          reputation_delta: -1
+          risk_delta: 3
+          skill: analysis
+  - id: false-alarm
+    title: False alarm
+    prompt: It was a penetration test!
+    weight: 1
+    options:
+      - id: end-scenario
+        label: End the scenario
+        narrative: It was just external penetration test that the CEO hired.
+        outcome:
+          description: End the scenario
+          skill: leadership
+          action: end
+  - id: food-poisoning
+    title: Food poisoning
+    prompt: One of you team member goes to the hospital with food poisoning.
+    options:
+      - id: loss-of-staff
+        label: Loss of staff
+        narrative: One of the team members ate some bad fish and is no longer part of the team,
+        outcome:
+          description: Say goodbye to one of the team members.
+          action: remove-member
+  - id: team-burnout
+    title: Team morale hits rock bottom
+    prompt: Your team is exhausted from the constant incident response.
+    options:
+      - id: give-break
+        label: Give the team a weekend off
+        narrative: Send everyone home for the weekend to recover mentally.
+        outcome:
+          description: The team returns refreshed and ready.
+          action: boost-morale
+          reputation_delta: -2
+          budget_delta: -5
+      - id: push-harder
+        label: Push the team harder
+        narrative: The incident requires all hands on deck; no time for breaks.
+        outcome:
+          description: Team suffers more burnout but shows commitment.
+          action: damage-morale
+          reputation_delta: 1
+          risk_delta: 5
+  - id: emergency-funding
+    title: Emergency funding becomes available
+    prompt: The board has approved emergency incident response funding.
+    options:
+      - id: accept-funds
+        label: Accept the emergency budget injection
+        narrative: Transfer emergency funds to the incident response budget.
+        outcome:
+          description: Additional budget available for response efforts.
+          action: double-budget
+          reputation_delta: 2
+      - id: decline-funds
+        label: Maintain fiscal discipline
+        narrative: Decline to use emergency funds to show fiscal responsibility.
+        outcome:
+          description: Board respects the restraint.
+          action: burn-budget
+          reputation_delta: 3
+          budget_delta: -10
+

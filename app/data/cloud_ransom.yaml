@@ -1,0 +1,285 @@
+id: cloud-ransom
+name: SaaS Supply Chain Breach
+briefing: >
+  Your org relies heavily on a SaaS vendor that just shipped a compromised update.
+  Malicious code is beaconing from multiple tenants, and legal/compliance teams
+  expect rapid action.
+starting_stage: detect
+stages:
+  - id: detect
+    title: Discovery & Scoping
+    summary: Multiple tenants show anomalous outbound traffic tied to a trojanized library.
+    challenges:
+      - id: scope-logs
+        title: Clarify blast radius
+        prompt: You need scope in minutes, not days. How do you get signal?
+        options:
+          - id: vendor-ask
+            label: Demand vendor telemetry export
+            narrative: Ask the SaaS vendor for artifact hashes, beacon destinations, and build logs.
+            outcome:
+              description: Vendor responds within 2 hours, but legal starts hovering.
+              budget_delta: -5
+              reputation_delta: 2
+              risk_delta: -5
+              skill: comms
+              next_stage: contain
+          - id: edr-hunt
+            label: Launch EDR threat hunt
+            narrative: Push global EQL/KQL queries to endpoints to find suspicious processes.
+            outcome:
+              description: Hunt narrows affected hosts but drains IR team capacity.
+              budget_delta: -8
+              reputation_delta: 1
+              risk_delta: -3
+              skill: analysis
+              next_stage: contain
+      - id: contract-read
+        title: Review vendor contract
+        prompt: Counsel wants to know leverage points with the vendor.
+        options:
+          - id: sla-pressure
+            label: Enforce SLA for incident comms
+            narrative: Cite breach notification timelines to escalate cooperation.
+            outcome:
+              description: Vendor assigns senior liaison; collaboration improves.
+              budget_delta: -2
+              reputation_delta: 2
+              risk_delta: -2
+              next_stage: contain
+              skill: comms
+          - id: wait-legal
+            label: Pause until counsel finishes review
+            narrative: Avoid antagonizing vendor until obligations are clear.
+            outcome:
+              description: Delays hamper detection; attackers gain time.
+              budget_delta: 0
+              reputation_delta: -2
+              risk_delta: 4
+              next_stage: contain
+              skill: leadership
+  - id: contain
+    title: Containment
+    summary: Beaconing hosts are identified; business wants minimal downtime.
+    challenges:
+      - id: token-rotation
+        title: Rotate credentials
+        prompt: API tokens to the SaaS are likely compromised.
+        options:
+          - id: forced-rotate
+            label: Force global key rotation
+            narrative: Invalidate all API keys and service principals immediately.
+            outcome:
+              description: Stops exfiltration but causes minor outages for partners.
+              budget_delta: -6
+              reputation_delta: -5
+              risk_delta: -8
+              next_stage: eradicate
+              skill: engineering
+              difficulty: 50
+          - id: selective-rotate
+            label: Rotate only high-risk tenants
+            narrative: Balance risk by targeting the most exposed tenants first.
+            outcome:
+              description: Keeps revenue systems stable but leaves residual exposure.
+              budget_delta: -3
+              reputation_delta: 1
+              risk_delta: -3
+              skill: engineering
+              difficulty: 100
+              next_stage: eradicate
+      - id: block-c2
+        title: Block outbound C2
+        prompt: C2 traffic uses dynamic DNS and multiple domains.
+        options:
+          - id: egress-block
+            label: Block by category + sinkhole
+            narrative: Push DNS sinkholes and block suspicious categories at firewalls.
+            outcome:
+              description: Cuts off exfil but triggers false positives.
+              budget_delta: -4
+              reputation_delta: 0
+              risk_delta: -6
+              next_stage: eradicate
+              skill: engineering
+              difficulty: 75
+          - id: monitor-first
+            label: Monitor before block
+            narrative: Collect fuller intel before applying heavy blocks.
+            outcome:
+              description: Gains intel but adversary pivots quickly.
+              budget_delta: -1
+              reputation_delta: 0
+              risk_delta: 6
+              skill: analysis
+              difficulty: 100
+              next_stage: eradicate
+  - id: eradicate
+    title: Eradication
+    summary: Malicious library versions are identified across CI/CD and endpoints.
+    challenges:
+      - id: rebuild-pipeline
+        title: Secure builds
+        prompt: Your internal build pipeline may have inherited the trojanized dependency.
+        options:
+          - id: freeze-releases
+            label: Freeze deployments and rebuild images
+            narrative: Halt releases, purge caches, rebuild from trusted sources.
+            outcome:
+              description: Risk plummets but product teams escalate.
+              budget_delta: -7
+              reputation_delta: -2
+              risk_delta: -10
+              skill: engineering
+              difficulty: 50
+              next_stage: recover
+          - id: parallel-build
+            label: Run clean-room build in parallel
+            narrative: Spin up isolated build path while legacy continues cautiously.
+            outcome:
+              description: Maintains velocity with manageable risk.
+              budget_delta: -10
+              reputation_delta: 2
+              risk_delta: -6
+              skill: engineering
+              difficulty: 100
+              next_stage: recover
+      - id: identity-hardening
+        title: Identity cleanup
+        prompt: Stolen service accounts could be abused for persistence.
+        options:
+          - id: remove-legacy
+            label: Delete legacy service accounts
+            narrative: Decommission stale principals and enforce MFA/conditional access.
+            outcome:
+              description: Identity posture improves; some automation breaks.
+              budget_delta: -5
+              reputation_delta: -2
+              risk_delta: -7
+              next_stage: recover
+              skill: engineering
+              difficulty: 50
+          - id: monitor-identities
+            label: Monitor suspicious auth instead
+            narrative: Instrument detections first, plan removals later.
+            outcome:
+              description: Detects some misuse but leaves doors open longer.
+              budget_delta: -2
+              reputation_delta: 0
+              risk_delta: -2
+              skill: analysis
+              difficulty: 100
+              next_stage: recover
+  - id: recover
+    title: Recovery & Communications
+    summary: Execs and regulators demand assurance that patient data stayed safe.
+    challenges:
+      - id: transparency
+        title: Public statement
+        prompt: How transparent should you be with customers?
+        options:
+          - id: candid-brief
+            label: Candid, risk-focused update
+            narrative: Share scope, fixes, and remaining unknowns.
+            outcome:
+              description: Trust increases; some churn risk.
+              budget_delta: -3
+              reputation_delta: 6
+              risk_delta: -4
+              skill: comms
+              difficulty: 50
+          - id: minimal-brief
+            label: Minimalistic holding statement
+            narrative: Keep details light to avoid legal exposure.
+            outcome:
+              description: Short-term quiet; reputational hit if leaks surface.
+              budget_delta: -1
+              reputation_delta: -5
+              risk_delta: 3
+              skill: comms
+              difficulty: 100
+      - id: regulator-pack
+        title: Regulator package
+        prompt: Regulators request an update within 72 hours.
+        options:
+          - id: full-pack
+            label: Provide full packet (IOCs, timeline, mitigations)
+            narrative: Engage counsel and compliance to craft thorough response.
+            outcome:
+              description: Regulators appreciate completeness; legal bill rises.
+              budget_delta: -6
+              reputation_delta: 4
+              risk_delta: -3
+              skill: comms
+          - id: interim-pack
+            label: Provide interim report
+            narrative: Send a lighter update and promise full report later.
+            outcome:
+              description: Buys time but prompts stricter oversight.
+              budget_delta: -2
+              reputation_delta: -4
+              risk_delta: 3
+              skill: comms
+              difficulty: 100
+injections:
+  - id: darkweb-leak
+    title: Dark web chatter
+    prompt: Threat intel reports chatter about your vendor breach and possible data sale.
+    options:
+      - id: ti-engage
+        label: Engage threat intel partner
+        narrative: Task partner to attribute chatter and monitor dumps.
+        outcome:
+          description: Early warning helps preempt extortion attempts.
+          budget_delta: -4
+          reputation_delta: 2
+          risk_delta: -4
+      - id: ignore-chatter
+        label: Ignore until confirmed
+        narrative: Avoid chasing rumors to preserve focus.
+        outcome:
+          description: Missed warning; attackers escalate extortion quietly.
+          budget_delta: 0
+          reputation_delta: -3
+          risk_delta: 5
+  - id: insider-tip
+    title: Insider tip
+    prompt: An engineer admits to bypassing change controls last week.
+    options:
+      - id: amnesty
+        label: Offer amnesty, gather facts
+        narrative: Encourage disclosure without punishment.
+        outcome:
+          description: You learn about shadow configs that ease scoping.
+          budget_delta: -1
+          reputation_delta: 1
+          risk_delta: -3
+      - id: disciplinary
+        label: Escalate to HR immediately
+        narrative: Follow strict policy, pausing their access.
+        outcome:
+          description: Sends signal on accountability but slows remediation.
+          budget_delta: -2
+          reputation_delta: -1
+          risk_delta: -1
+  - id: tool-outage
+    title: Detection outage
+    prompt: Your SIEM ingestion pipeline fails mid-incident.
+    options:
+      - id: fallback-logging
+        label: Enable emergency logging to S3
+        narrative: Switch to cheaper storage with ad-hoc queries.
+        outcome:
+          description: Retains evidence; analysis is slower.
+          budget_delta: -3
+          reputation_delta: 0
+          risk_delta: -2
+      - id: triage-with-edr
+        label: Rely on EDR telemetry only
+        narrative: Limit scope to hosts with strong EDR visibility.
+        outcome:
+          description: Faster searches but blind to SaaS-side activity.
+          budget_delta: -1
+          reputation_delta: 0
+          risk_delta: 3
+

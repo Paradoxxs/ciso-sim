@@ -1,0 +1,65 @@
+members:
+  - id: intel-analyst
+    name: Alex Chen
+    role: Threat Intel Analyst
+    cost: 50
+    stats:
+      analysis: 82
+      comms: 35
+      engineering: 55
+      leadership: 25
+  - id: ir-lead
+    name: Priya Singh
+    role: Incident Response Lead
+    cost: 70
+    stats:
+      analysis: 78
+      comms: 29
+      engineering: 70
+      leadership: 15
+  - id: detections
+    name: Morgan Ellis
+    role: Detection Engineer
+    cost: 60
+    stats:
+      analysis: 75
+      comms: 31
+      engineering: 88
+      leadership: 22
+  - id: cloud-eng
+    name: Samir Patel
+    role: Cloud Security Engineer
+    cost: 55
+    stats:
+      analysis: 68
+      comms: 21
+      engineering: 85
+      leadership: 32
+  - id: comms-lead
+    name: Riley Moore
+    role: Comms/PR Lead
+    cost: 65
+    stats:
+      analysis: 25
+      comms: 90
+      engineering: 30
+      leadership: 80
+  - id: legal
+    name: Jordan Alvarez
+    role: Counsel
+    cost: 45
+    stats:
+      analysis: 24
+      comms: 78
+      engineering: 35
+      leadership: 72
+  - id: reverse-engineer
+    name: Anker Kumar
+    role: Reverse Engineer
+    cost: 75
+    stats:
+      analysis: 80
+      comms: 10
+      engineering: 100
+      leadership: 2
+

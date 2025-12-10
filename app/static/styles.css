@@ -1,0 +1,242 @@
+:root {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #e2e8f0;
+  background-color: #020617;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.app-header {
+  padding: 1.5rem 3rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  background: radial-gradient(circle at top, rgba(15, 118, 110, 0.3), transparent);
+}
+
+main {
+  padding: 2rem 3rem 3rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+.scenario-panel,
+.game-panel {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+select,
+button {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+}
+
+select {
+  background: #0f172a;
+  color: inherit;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+button {
+  background: linear-gradient(135deg, #2563eb, #14b8a6);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.briefing {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.status {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.status div {
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.status span {
+  display: block;
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.member-card {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.05);
+  cursor: pointer;
+}
+
+.member-card input {
+  margin-top: 0.2rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.08);
+  color: inherit;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+#stage-panel {
+  min-height: 220px;
+  border-radius: 10px;
+  border: 1px dashed rgba(148, 163, 184, 0.3);
+  padding: 1.5rem;
+}
+
+.challenge {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.option-card {
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  padding: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.option-card:hover {
+  border-color: #38bdf8;
+  transform: translateY(-2px);
+}
+
+.badge {
+  padding: 0.25rem 0.6rem;
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.6);
+  color: #fcd34d;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.placeholder {
+  color: rgba(226, 232, 240, 0.6);
+}
+
+#history-panel {
+  margin-top: 2rem;
+}
+
+#history {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#history li {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.15);
+  font-size: 0.9rem;
+}
+
+.team-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.option-meta {
+  font-size: 0.85rem;
+  color: rgba(226, 232, 240, 0.75);
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+

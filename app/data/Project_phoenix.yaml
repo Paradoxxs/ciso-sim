@@ -1,0 +1,287 @@
+id: phoenix-prod-outage
+name: "Parts Unlimited: Emergency Deployment Failure"
+briefing: >
+  A high-risk change intended to accelerate revenue — a customer-facing feature
+  for Parts Unlimited — was deployed to production during a high-load window.
+  Immediately after deployment customers report errors and downstream systems
+  begin queueing transactions. Business leaders demand rapid restoration while
+  stakeholders press for an explanation.
+starting_stage: detect
+stages:
+  - id: detect
+    title: "Detection & Triage"
+    summary: Alerts and customer tickets spike following a recent deployment; several downstream services report increased latency and error rates.
+    challenges:
+      - id: triage-impact
+        title: "Assess user impact quickly"
+        prompt: You need an accurate impact estimate to brief the business and prioritize work.
+        options:
+          - id: realtime-metrics
+            label: "Use realtime metrics & telemetry"
+            narrative: Query APM, service traces, and error rates to quantify affected customers and feature impact.
+            outcome:
+              description: Provides clear impact numbers for execs; operational teams gain direction.
+              budget_delta: -2
+              reputation_delta: 2
+              risk_delta: -4
+              next_stage: contain
+              skill: analysis
+          - id: ticket-sampling
+            label: "Sample support tickets for surface-level view"
+            narrative: Rapidly sample customer tickets and correlate with release time to estimate severity.
+            outcome:
+              description: Fast overview but undercounts silent failures; leadership is briefly reassured.
+              budget_delta: -1
+              reputation_delta: -1
+              risk_delta: 3
+              next_stage: contain
+              skill: comms
+      - id: find-root
+        title: "Locate suspect change"
+        prompt: Multiple commits and a rushed merge occurred; find the most-likely release artifact.
+        options:
+          - id: ci-artifact-scan
+            label: "Scan recent CI artifacts and hashes"
+            narrative: Pull build artifacts, check signatures, and run smoke tests against artifacts in staging.
+            outcome:
+              description: Pinpoints faulty artifact quickly; gives reproducible test case for engineers.
+              budget_delta: -3
+              reputation_delta: 1
+              risk_delta: -5
+              next_stage: contain
+              skill: engineering
+          - id: dev-interview
+            label: "Interview devs & on-call engineers"
+            narrative: Talk to the deployment owner and on-call team to get context and recent changes.
+            outcome:
+              description: Gains context about risky hotfixes but wastes time if logs are better evidence.
+              budget_delta: -1
+              reputation_delta: 0
+              risk_delta: 1
+              next_stage: contain
+              skill: comms
+
+  - id: contain
+    title: "Containment"
+    summary: The triage determined a deployment artifact caused regressions that cascade into queues and third-party integrations.
+    challenges:
+      - id: rollback-vs-hotfix
+        title: "Decide rollback or quick fix"
+        prompt: Business wants minimal downtime; ops worry rollback may reintroduce other bugs.
+        options:
+          - id: immediate-rollback
+            label: "Rollback to previous known-good release"
+            narrative: Revert the deployment globally to stop errors and restore availability.
+            outcome:
+              description: Availability restored quickly; some new features are lost and long-running migrations must be reconciled.
+              budget_delta: -4
+              reputation_delta: 2
+              risk_delta: -6
+              next_stage: eradicate
+              skill: leadership
+          - id: targeted-patch
+            label: "Deploy targeted hotfix to failing paths"
+            narrative: Patch only the faulty module and restart affected services to avoid full rollback.
+            outcome:
+              description: Faster for critical paths with less feature loss, but leaves risk of incomplete fixes and hidden faults.
+              budget_delta: -3
+              reputation_delta: 1
+              risk_delta: -3
+              next_stage: eradicate
+              skill: engineering
+      - id: traffic-control
+        title: "Reduce blast radius"
+        prompt: The failing functionality is used by a subset of customers and integrations.
+        options:
+          - id: feature-flag-disable
+            label: "Turn off feature via feature flag / traffic split"
+            narrative: Disable the new feature or route a portion of traffic away while investigating.
+            outcome:
+              description: Lowers customer impact and creates breathing room for remediation.
+              budget_delta: -2
+              reputation_delta: 1
+              risk_delta: -4
+              next_stage: eradicate
+              skill: engineering
+          - id: throttling
+            label: "Throttle or queue inbound requests"
+            narrative: Apply rate limits and backpressure to prevent downstream overload.
+            outcome:
+              description: Protects systems but increases customer latency and support volume.
+              budget_delta: -1
+              reputation_delta: -1
+              risk_delta: -2
+              next_stage: eradicate
+              skill: analysis
+
+  - id: eradicate
+    title: "Eradication & Fix"
+    summary: With immediate availability addressed, the team must remove root causes and harden the pipeline to prevent recurrence.
+    challenges:
+      - id: root-cause
+        title: "Perform root cause analysis"
+        prompt: Determine whether the failure was process (e.g., bypassed testing), code, or infra related.
+        options:
+          - id: blameless-postmortem
+            label: "Conduct a blameless post-incident RCA"
+            narrative: Collect timelines, reproduce failure, and identify systemic process failures without finger-pointing.
+            outcome:
+              description: Actionable systemic improvements are found; teams commit to changes.
+              budget_delta: -3
+              reputation_delta: 2
+              risk_delta: -6
+              next_stage: recover
+              skill: analysis
+          - id: punitive-action
+            label: "Escalate to disciplinary process for the devs involved"
+            narrative: Hold individuals accountable for policy violations to demonstrate control.
+            outcome:
+              description: Short-term perception of accountability but damages morale and reduces information sharing.
+              budget_delta: -1
+              reputation_delta: -2
+              risk_delta: 2
+              next_stage: recover
+              skill: leadership
+      - id: pipeline-fix
+        title: "Fix CI/CD & testing gaps"
+        prompt: Automated tests, gating, and deployability appear insufficient for complex releases.
+        options:
+          - id: strengthen-gates
+            label: "Add stricter gating and automated integration tests"
+            narrative: Enforce pre-deploy tests, add canary deployments, and require signed artifacts.
+            outcome:
+              description: Reduces future risk significantly but slows release cadence and requires investment.
+              budget_delta: -6
+              reputation_delta: 2
+              risk_delta: -8
+              next_stage: recover
+              skill: engineering
+          - id: lightweight-checks
+            label: "Add lightweight preflight checks now"
+            narrative: Implement quick sanity checks and basic smoke tests that run before any production rollout.
+            outcome:
+              description: Improves safety quickly with moderate cost; some deeper issues remain untested.
+              budget_delta: -2
+              reputation_delta: 1
+              risk_delta: -4
+              next_stage: recover
+              skill: engineering
+
+  - id: recover
+    title: "Recovery, Communication & Process Change"
+    summary: Business demands assurance this won't recur; teams must restore confidence, update processes, and communicate to customers and internal stakeholders.
+    challenges:
+      - id: customer-comm
+        title: "Customer communication"
+        prompt: How transparent will you be in customer-facing communications and support guidance?
+        options:
+          - id: full-disclosure
+            label: "Full technical disclosure to affected customers"
+            narrative: Provide an incident timeline, root cause summary, and mitigations to customers and partners.
+            outcome:
+              description: Increases trust for technical customers but risks regulatory/legal scrutiny and broader PR attention.
+              budget_delta: -2
+              reputation_delta: 3
+              risk_delta: -2
+              skill: comms
+          - id: concise-statement
+            label: "High-level holding statement"
+            narrative: Provide non-technical assurances and support contacts without deep technical details.
+            outcome:
+              description: Limits legal exposure but may frustrate technical customers seeking answers.
+              budget_delta: -1
+              reputation_delta: -1
+              risk_delta: 2
+              skill: leadership
+      - id: org-change
+        title: "Implement organizational improvements"
+        prompt: Sponsors want durable changes to prevent recurrence while preserving delivery momentum.
+        options:
+          - id: invest-platops
+            label: "Fund platform and DevOps investments"
+            narrative: Create a platform team to own CI/CD, deployability, and runbooks; formalize SRE practices.
+            outcome:
+              description: Long-term velocity and reliability improve; budget increases and roadmap reprioritization occurs.
+              budget_delta: -8
+              reputation_delta: 4
+              risk_delta: -9
+              skill: leadership
+          - id: process-tweaks
+            label: "Apply process and policy tweaks"
+            narrative: Tighten change windows, require approvals for high-risk releases, and increase monitoring.
+            outcome:
+              description: Quick governance wins but may not solve underlying technical debt.
+              budget_delta: -2
+              reputation_delta: 1
+              risk_delta: -3
+              skill: comms
+
+injections:
+  - id: urgent-mkt-push
+    title: "Marketing pushes deadline"
+    prompt: Marketing insists on going live for a major campaign and pressures engineering to re-enable the feature immediately.
+    options:
+      - id: delay-launch
+        label: "Refuse to re-enable until safe"
+        narrative: Stand firm, citing operational risk and acceptance criteria not met.
+        outcome:
+          description: Marketing is upset but systems remain protected; leadership supports cautious stance.
+          budget_delta: 0
+          reputation_delta: -1
+          risk_delta: -5
+          skill: leadership
+      - id: phased-launch
+        label: "Agree to a phased, tightly monitored re-launch"
+        narrative: Allow a small subset of traffic under strict telemetry and rollback controls.
+        outcome:
+          description: Balances business needs and risk; increases monitoring effort.
+          budget_delta: -1
+          reputation_delta: 1
+          risk_delta: -2
+          skill: comms
+
+  - id: auditor-scrutiny
+    title: "Unexpected audit interest"
+    prompt: Internal audit flags the incident and requests immediate documentation and evidence of controls.
+    options:
+      - id: produce-docs
+        label: "Produce full documentation & evidence"
+        narrative: Provide logs, deployment records, and postmortem artifacts to auditors promptly.
+        outcome:
+          description: Satisfies auditors and strengthens compliance posture; operational teams diverted.
+          budget_delta: -2
+          reputation_delta: 2
+          risk_delta: -3
+          skill: analysis
+      - id: interim-brief
+        label: "Provide interim summary and promise fuller packet later"
+        narrative: Give auditors a concise briefing and commit to a detailed package on a set timeline.
+        outcome:
+          description: Buys time but invites follow-up audits and pressure.
+          budget_delta: -1
+          reputation_delta: -1
+          risk_delta: 2
+          skill: comms
+
+  - id: dev-bypass
+    title: "Developer bypassed tests"
+    prompt: A developer confesses to bypassing the pipeline due to an urgent bugfix.
+    options:
+      - id: retrofitting-tests
+        label: "Add tests retroactively and require re-signing"
+        narrative: Require that the bypassed changes be covered by tests and revalidated through CI before any re-enable.
+        outcome:
+          description: Fixes gap and prevents immediate repeat but consumes dev cycles.
+          budget_delta: -2
+          reputation_delta: 1
+          risk_delta: -4
+          skill: engineering
+      - id: immediate-discipline
+        label: "Apply immediate disciplinary action"
+        narrative: Enforce policy through HR/discipline to deter future bypasses.
+        outcome:
+          description: Sends deterrent message but risks reducing reporting of future process workarounds.
+          budget_delta: -1
+          reputation_delta: -2
+          risk_delta: 2
+          skill: leadership

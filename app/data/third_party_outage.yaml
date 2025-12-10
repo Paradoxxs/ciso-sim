@@ -1,0 +1,285 @@
+id: third-party-outage
+name: Third-Party MSP Breach
+briefing: >
+  Your managed service provider is compromised. Attackers are abusing their remote
+  tooling to push ransomware and access backups. You must navigate vendor risk,
+  business continuity, and public comms.
+starting_stage: detect
+stages:
+  - id: detect
+    title: Early Indicators
+    summary: Helpdesk tickets show remote sessions opening without users present.
+    challenges:
+      - id: confirm-abuse
+        title: Confirm MSP tool abuse
+        prompt: How do you validate if MSP credentials are abused?
+        options:
+          - id: pull-logs
+            label: Pull MSP audit logs immediately
+            narrative: Request detailed session logs and MFA events from MSP SOC.
+            outcome:
+              description: Confirms compromise; evidence gathering begins.
+              budget_delta: -4
+              reputation_delta: 1
+              risk_delta: -4
+              next_stage: engage-msp
+              skill: analysis
+          - id: block-first
+            label: Block MSP access preemptively
+            narrative: Cut all MSP VPN and RMM access to stop bleeding.
+            outcome:
+              description: Stops active abuse but halts operations support.
+              budget_delta: -3
+              reputation_delta: -1
+              risk_delta: -6
+              next_stage: engage-msp
+              skill: leadership
+      - id: engage-msp
+        title: Engage MSP leadership
+        prompt: MSP leadership offers to handle incident response themselves.
+        options:
+          - id: joint-warroom
+            label: Form joint war room
+            narrative: Combine teams with shared channel and clear RACI.
+            outcome:
+              description: Improves coordination but consumes exec time.
+              budget_delta: -5
+              reputation_delta: 2
+              risk_delta: -2
+              next_stage: contain
+              skill: comms
+          - id: take-over
+            label: Take full control internally
+            narrative: Limit MSP role to observation while you lead.
+            outcome:
+              description: Ensures control but slows due to limited tooling access.
+              budget_delta: -2
+              reputation_delta: 0
+              risk_delta: -3
+              next_stage: contain
+              skill: leadership
+
+  - id: contain
+    title: Containment
+    summary: Ransomware pushes and data exfil attempt detected on critical servers.
+    challenges:
+      - id: rmm-disable
+        title: Disable remote tooling
+        prompt: MSP RMM agent is the attack vector.
+        options:
+          - id: mass-uninstall
+            label: Mass-uninstall RMM agent
+            narrative: Script removal across fleet, expect downtime.
+            outcome:
+              description: Attack channel cut; ops teams scramble for access.
+              budget_delta: -6
+              reputation_delta: -1
+              risk_delta: -9
+              next_stage: eradicate
+              skill: engineering
+          - id: network-isolate
+            label: Isolate RMM network egress
+            narrative: Firewall rules block agent traffic while keeping agents installed.
+            outcome:
+              description: Faster; leaves residual persistence risk.
+              budget_delta: -3
+              reputation_delta: 1
+              risk_delta: -5
+              next_stage: eradicate
+              skill: engineering
+      - id: privileged-creds
+        title: Tackle privileged credentials
+        prompt: MSP had domain admin in some tenants.
+        options:
+          - id: rotate-admins
+            label: Rotate and disable MSP admin accounts
+            narrative: Enforce password + key rotation, disable dormant creds.
+            outcome:
+              description: Removes high-value access; minor outages for patching.
+              budget_delta: -4
+              reputation_delta: 1
+              risk_delta: -6
+              next_stage: eradicate
+              skill: engineering
+          - id: monitor-admins
+            label: Monitor first, rotate later
+            narrative: Deploy detections around admin use before rotating.
+            outcome:
+              description: Keeps operations steady; higher exposure window.
+              budget_delta: -1
+              reputation_delta: 0
+              risk_delta: 4
+              next_stage: eradicate
+              skill: analysis
+
+  - id: eradicate
+    title: Eradication
+    summary: You need to remove MSP persistence and clean impacted systems.
+    challenges:
+      - id: golden-ticket
+        title: Kerberos artifacts
+        prompt: DCs show abnormal ticket lifetimes.
+        options:
+          - id: purge-krbtgt
+            label: Rotate krbtgt twice
+            narrative: Force ticket invalidation, coordinate domain-wide.
+            outcome:
+              description: Cuts persistence; risk of auth blips.
+              budget_delta: -7
+              reputation_delta: 1
+              risk_delta: -10
+              next_stage: recover
+              skill: engineering
+          - id: monitor-kerb
+            label: Monitor Kerberos anomalies
+            narrative: Watch for TGS/TGT anomalies before drastic action.
+            outcome:
+              description: Lower disruption; attackers may retain access.
+              budget_delta: -2
+              reputation_delta: 0
+              risk_delta: -3
+              next_stage: recover
+              skill: analysis
+      - id: backups
+        title: Backup integrity
+        prompt: Backups may be poisoned or deleted.
+        options:
+          - id: offline-restore-test
+            label: Restore from offline copy and test
+            narrative: Validate offline backups; run tabletop restore.
+            outcome:
+              description: Confirms clean restore path; slows production recovery.
+              budget_delta: -5
+              reputation_delta: 2
+              risk_delta: -6
+              next_stage: recover
+              skill: engineering
+          - id: trust-cloud
+            label: Trust cloud backups with extra scanning
+            narrative: Use cloud backups but add malware scanning.
+            outcome:
+              description: Faster recovery; slight reinfection risk.
+              budget_delta: -3
+              reputation_delta: 0
+              risk_delta: -2
+              next_stage: recover
+              skill: analysis
+
+  - id: recover
+    title: Recovery & Assurance
+    summary: Business wants SLAs restored and customers reassured.
+    challenges:
+      - id: staged-restore
+        title: Restore sequence
+        prompt: Which systems come back first?
+        options:
+          - id: revenue-first
+            label: Restore revenue systems first
+            narrative: Prioritize payment and customer portals.
+            outcome:
+              description: Revenue stabilizes; ops still degraded.
+              budget_delta: -4
+              reputation_delta: 3
+              risk_delta: -2
+              skill: leadership
+          - id: security-first
+            label: Restore identity and logging first
+            narrative: Harden before enabling revenue apps.
+            outcome:
+              description: Stronger posture; delayed revenue.
+              budget_delta: -3
+              reputation_delta: 1
+              risk_delta: -4
+              skill: engineering
+      - id: customer-comm
+        title: Customer communications
+        prompt: Customers demand proof of safety.
+        options:
+          - id: detailed-postmortem
+            label: Publish detailed postmortem
+            narrative: Include timeline, controls, and future commitments.
+            outcome:
+              description: Trust improves; legal reviews intensify.
+              budget_delta: -4
+              reputation_delta: 5
+              risk_delta: -3
+              skill: comms
+          - id: limited-update
+            label: Limited update with assurances
+            narrative: Short statement, offer private briefings for key accounts.
+            outcome:
+              description: Keeps noise down; some clients remain anxious.
+              budget_delta: -2
+              reputation_delta: -1
+              risk_delta: 1
+              skill: comms
+
+injections:
+  - id: ransomware-note
+    title: Ransom note on kiosk
+    prompt: A lobby kiosk shows a ransom note demanding payment in 48 hours.
+    options:
+      - id: seize-kiosk
+        label: Seize and forensically image kiosk
+        narrative: Treat kiosk as evidence; delay public use.
+        outcome:
+          description: Gains intel; PR has to manage onsite visitors.
+          budget_delta: -3
+          reputation_delta: -1
+          risk_delta: -2
+          skill: analysis
+      - id: wipe-redeploy
+        label: Wipe and redeploy kiosk immediately
+        narrative: Restore service quickly without deep forensics.
+        outcome:
+          description: Removes note fast; potential evidence lost.
+          budget_delta: -1
+          reputation_delta: 1
+          risk_delta: 2
+          skill: engineering
+
+  - id: regulator-ping
+    title: Regulator drop-in
+    prompt: A regulator emails asking for a same-day call.
+    options:
+      - id: schedule-brief
+        label: Schedule rapid briefing
+        narrative: Pull counsel and compliance into a structured update.
+        outcome:
+          description: Regulator is appeased; extra reporting required.
+          budget_delta: -2
+          reputation_delta: 2
+          risk_delta: -1
+          skill: comms
+      - id: defer-24h
+        label: Defer for 24 hours
+        narrative: Ask for one-day delay to collect facts.
+        outcome:
+          description: Raises suspicion; short-term breathing room.
+          budget_delta: -1
+          reputation_delta: -2
+          risk_delta: 1
+          skill: leadership
+
+  - id: staff-fatigue
+    title: Staff fatigue
+    prompt: IR team is on hour 20; mistakes are creeping in.
+    options:
+      - id: force-rest
+        label: Force rotations and rest
+        narrative: Enforce 8-hour shifts even if speed drops.
+        outcome:
+          description: Fewer mistakes; containment pace slows.
+          budget_delta: -1
+          reputation_delta: 0
+          risk_delta: -2
+          skill: leadership
+      - id: push-through
+        label: Push through for 6 more hours
+        narrative: Maintain momentum at the cost of fatigue.
+        outcome:
+          description: Faster actions; risk of errors and burnout.
+          budget_delta: 0
+          reputation_delta: -1
+          risk_delta: 3
+          skill: leadership

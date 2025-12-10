@@ -1,0 +1,85 @@
+id: ransomware-incident
+name: Midnight Ransomware
+briefing: >
+  A regional hospital has lost access to its clinical systems after a targeted
+  ransomware attack. You are the acting CISO, reporting directly to the CEO.
+starting_stage: detect
+stages:
+  - id: detect
+    title: Detection & Triage
+    summary: NOC reported suspicious SMB traffic followed by widespread file renames.
+    challenges:
+      - id: initial-brief
+        title: Establish situational awareness
+        prompt: Clinicians are panicking. ER throughput is down 40%. What is your first move?
+        options:
+          - id: assemble-tiger
+            label: Convene tiger team
+            narrative: Bring IR lead, legal, comms, and ops together immediately.
+            outcome:
+              description: The multidisciplinary team frames the problem quickly.
+              budget_delta: -5
+              reputation_delta: 2
+              risk_delta: -5
+              next_stage: contain
+              skill: leadership
+          - id: call-msp
+            label: Call managed service provider
+            narrative: Engage the MDR partner to take point on triage.
+            outcome:
+              description: MSP brings tooling but loses an hour onboarding.
+              budget_delta: -10
+              reputation_delta: 0
+              risk_delta: 5
+              skill: comms
+              next_stage: contain
+  - id: contain
+    title: Containment
+    summary: Critical systems are offline. Law enforcement and regulators are asking for updates.
+    challenges:
+      - id: comms-strategy
+        title: Executive communications
+        prompt: CEO wants to reassure the press that everything is under control.
+        options:
+          - id: transparent-update
+            label: Issue cautious transparency statement
+            narrative: Share known facts, emphasize patient safety focus.
+            outcome:
+              description: Stakeholders appreciate honesty, but raise scrutiny.
+              budget_delta: -5
+              reputation_delta: 5
+              risk_delta: -2
+              skill: comms
+          - id: optimistic-update
+            label: Promise rapid restoration
+            narrative: Overpromise to buy time.
+            outcome:
+              description: Optimistic statements backfire when systems stay down.
+              budget_delta: 0
+              reputation_delta: -8
+              risk_delta: 8
+              skill: comms
+injections:
+  - id: phishing-spike
+    title: Phishing spike
+    prompt: Employees report a sudden spike in phishing tied to the incident.
+    options:
+      - id: block-domains
+        label: Block lookalike domains and warn staff
+        narrative: Update mail filters and send urgent comms.
+        outcome:
+          description: Reduces clicks; minor disruption to legit mail.
+          budget_delta: -2
+          reputation_delta: 1
+          risk_delta: -3
+          skill: comms
+      - id: monitor-only
+        label: Monitor before blocking
+        narrative: Collect samples to improve detections first.
+        outcome:
+          description: Gains intel but some users click.
+          budget_delta: 0
+          reputation_delta: -1
+          risk_delta: 3
+          skill: analysis
+
