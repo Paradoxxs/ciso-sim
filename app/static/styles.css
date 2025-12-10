@@ -234,6 +234,92 @@ button:disabled {
   margin-top: 0.25rem;
 }
 
+.fired-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fired-banner {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(248, 113, 113, 0.1));
+  border: 2px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.fired-banner h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fca5a5;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.fired-details {
+  background: rgba(148, 163, 184, 0.05);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.fired-details h2 {
+  margin-top: 0;
+  color: #fca5a5;
+  font-size: 1.3rem;
+}
+
+.fired-details p {
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.final-stats {
+  margin-top: 1.5rem;
+}
+
+.final-stats h3 {
+  margin-top: 0;
+  color: #94a3b8;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 10px;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(226, 232, 240, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fca5a5;
+  margin-top: 0.5rem;
+}
+
+.restart-prompt {
+  text-align: center;
+  color: rgba(226, 232, 240, 0.6);
+  font-style: italic;
+}
+
 @media (max-width: 980px) {
   .layout {
     grid-template-columns: 1fr;

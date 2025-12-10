@@ -36,3 +36,16 @@ docs/
 - Add facilitator dashboard with timeline playback.
 - Generate scoring badges for leadership competencies.
 
+## Terminal (text) version
+
+A simple text-based interface is available to run scenarios from the terminal (no web UI required).
+
+Activate your Python environment and run:
+
+```powershell
+python -m app.cli --list-scenarios
+python -m app.cli --scenario <scenario_id>
+```
+
+Use `--auto-team` to select a default team automatically. When run interactively the CLI will prompt you to choose a scenario and team members.
+

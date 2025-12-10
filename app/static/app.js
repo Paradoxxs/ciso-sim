@@ -152,7 +152,13 @@ async function chooseOption(optionId) {
     updateStatus(result.state);
     appendHistory(result);
     if (result.finished) {
-      stagePanel.innerHTML = `<p class="placeholder">Simulation complete. Start a new session to replay.</p>`;
+      // Check if fired (budget or reputation <= 0)
+      const fired = result.state.budget <= 0 || result.state.reputation <= 0;
+      if (fired) {
+        renderFiredScreen(result);
+      } else {
+        stagePanel.innerHTML = `<p class="placeholder">Simulation complete. Start a new session to replay.</p>`;
+      }
       sessionId = null;
       setRosterDisabled(false);
     } else {
@@ -164,6 +170,41 @@ async function chooseOption(optionId) {
   } finally {
     toggleOptions(false);
   }
+}
+
+function renderFiredScreen(result) {
+  const reason = result.outcome;
+  const state = result.state;
+  
+  stagePanel.innerHTML = `
+    <div class="fired-screen">
+      <div class="fired-banner">
+        <h1>YOU HAVE BEEN FIRED AS CISO</h1>
+      </div>
+      <article class="fired-details">
+        <h2>Reason for Dismissal</h2>
+        <p>${reason}</p>
+        <section class="final-stats">
+          <h3>Final State</h3>
+          <div class="stat-grid">
+            <div class="stat-item">
+              <span class="stat-label">Budget</span>
+              <span class="stat-value">${state.budget}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Reputation</span>
+              <span class="stat-value">${state.reputation}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Risk</span>
+              <span class="stat-value">${state.risk}</span>
+            </div>
+          </div>
+        </section>
+      </article>
+      <p class="restart-prompt">Start a new session to try again.</p>
+    </div>
+  `;
 }
 
 function renderStage(stage) {

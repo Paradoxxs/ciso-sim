@@ -95,6 +95,18 @@ class SimulationEngine:
             else:
                 self._execute_action(outcome.action)
 
+        # If budget or reputation fall to zero or below, the CISO is fired — immediate game over.
+        firing_message = None
+        if self.state.budget <= 0:
+            firing_message = (
+                "Your budget has been exhausted. The board has lost confidence and you have been fired for mismanagement."
+            )
+            finished = True
+        elif self.state.reputation <= 0:
+            firing_message = (
+                "Your organization's reputation has collapsed. The board holds leadership accountable — you have been fired for mismanagement."
+            )
+
         if presentable.get("is_injection"):
             self.active_injection = None
         else:
@@ -124,11 +136,13 @@ class SimulationEngine:
 
         if not presentable.get("is_injection"):
             finished = finished or self.round >= settings.max_rounds
+
+        outcome_text = firing_message if firing_message is not None else outcome.description
         return {
             "state": asdict(self.state),
             "round": self.round,
             "finished": finished,
-            "outcome": outcome.description,
+            "outcome": outcome_text,
             "success": success,
         }
 

@@ -19,7 +19,7 @@ stages:
             narrative: Request detailed session logs and MFA events from MSP SOC.
             outcome:
               description: Confirms compromise; evidence gathering begins.
-              budget_delta: -4
+              budget_delta: -8
               reputation_delta: 1
               risk_delta: -4
               next_stage: engage-msp
@@ -29,7 +29,7 @@ stages:
             narrative: Cut all MSP VPN and RMM access to stop bleeding.
             outcome:
               description: Stops active abuse but halts operations support.
-              budget_delta: -3
+              budget_delta: -6
               reputation_delta: -1
               risk_delta: -6
               next_stage: engage-msp
@@ -43,7 +43,7 @@ stages:
             narrative: Combine teams with shared channel and clear RACI.
             outcome:
               description: Improves coordination but consumes exec time.
-              budget_delta: -5
+              budget_delta: -10
               reputation_delta: 2
               risk_delta: -2
               next_stage: contain
@@ -53,7 +53,7 @@ stages:
             narrative: Limit MSP role to observation while you lead.
             outcome:
               description: Ensures control but slows due to limited tooling access.
-              budget_delta: -2
+              budget_delta: -4
               reputation_delta: 0
               risk_delta: -3
               next_stage: contain
@@ -72,7 +72,7 @@ stages:
             narrative: Script removal across fleet, expect downtime.
             outcome:
               description: Attack channel cut; ops teams scramble for access.
-              budget_delta: -6
+              budget_delta: -10
               reputation_delta: -1
               risk_delta: -9
               next_stage: eradicate
@@ -82,7 +82,7 @@ stages:
             narrative: Firewall rules block agent traffic while keeping agents installed.
             outcome:
               description: Faster; leaves residual persistence risk.
-              budget_delta: -3
+              budget_delta: -6
               reputation_delta: 1
               risk_delta: -5
               next_stage: eradicate
@@ -96,7 +96,7 @@ stages:
             narrative: Enforce password + key rotation, disable dormant creds.
             outcome:
               description: Removes high-value access; minor outages for patching.
-              budget_delta: -4
+              budget_delta: -8
               reputation_delta: 1
               risk_delta: -6
               next_stage: eradicate
@@ -106,9 +106,9 @@ stages:
             narrative: Deploy detections around admin use before rotating.
             outcome:
               description: Keeps operations steady; higher exposure window.
-              budget_delta: -1
+              budget_delta: -2
               reputation_delta: 0
-              risk_delta: 4
+              risk_delta: 12
               next_stage: eradicate
               skill: analysis
 
@@ -137,7 +137,7 @@ stages:
               description: Lower disruption; attackers may retain access.
               budget_delta: -2
               reputation_delta: 0
-              risk_delta: -3
+              risk_delta: 3
               next_stage: recover
               skill: analysis
       - id: backups
@@ -149,7 +149,7 @@ stages:
             narrative: Validate offline backups; run tabletop restore.
             outcome:
               description: Confirms clean restore path; slows production recovery.
-              budget_delta: -5
+              budget_delta: -10
               reputation_delta: 2
               risk_delta: -6
               next_stage: recover
@@ -161,7 +161,7 @@ stages:
               description: Faster recovery; slight reinfection risk.
               budget_delta: -3
               reputation_delta: 0
-              risk_delta: -2
+              risk_delta: 2
               next_stage: recover
               skill: analysis
 
@@ -178,7 +178,7 @@ stages:
             narrative: Prioritize payment and customer portals.
             outcome:
               description: Revenue stabilizes; ops still degraded.
-              budget_delta: -4
+              budget_delta: -8
               reputation_delta: 3
               risk_delta: -2
               skill: leadership
@@ -187,7 +187,7 @@ stages:
             narrative: Harden before enabling revenue apps.
             outcome:
               description: Stronger posture; delayed revenue.
-              budget_delta: -3
+              budget_delta: -8
               reputation_delta: 1
               risk_delta: -4
               skill: engineering
@@ -200,7 +200,7 @@ stages:
             narrative: Include timeline, controls, and future commitments.
             outcome:
               description: Trust improves; legal reviews intensify.
-              budget_delta: -4
+              budget_delta: -8
               reputation_delta: 5
               risk_delta: -3
               skill: comms
@@ -211,7 +211,7 @@ stages:
               description: Keeps noise down; some clients remain anxious.
               budget_delta: -2
               reputation_delta: -1
-              risk_delta: 1
+              risk_delta: 8
               skill: comms
 
 injections:
@@ -235,7 +235,7 @@ injections:
           description: Removes note fast; potential evidence lost.
           budget_delta: -1
           reputation_delta: 1
-          risk_delta: 2
+          risk_delta: 8
           skill: engineering
 
   - id: regulator-ping
@@ -247,7 +247,7 @@ injections:
         narrative: Pull counsel and compliance into a structured update.
         outcome:
           description: Regulator is appeased; extra reporting required.
-          budget_delta: -2
+          budget_delta: -6
           reputation_delta: 2
           risk_delta: -1
           skill: comms
