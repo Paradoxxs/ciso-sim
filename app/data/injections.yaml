@@ -25,12 +25,12 @@ injections:
           skill: analysis
   - id: false-alarm
     title: False alarm
-    prompt: It was a penetration test!
+    prompt: It was just a penetration test!
     weight: 1
     options:
       - id: end-scenario
         label: End the scenario
-        narrative: It was just external penetration test that the CEO hired.
+        narrative: Relax, it was penetration test that the CEO hired to test the team.
         outcome:
           description: End the scenario
           skill: leadership
@@ -84,4 +84,25 @@ injections:
           action: burn-budget
           reputation_delta: 3
           budget_delta: -10
+  - id: data-upload
+    title: Data upload to pastebin 
+    prompt: The attacker has uploaded data to pastebin.
+    options:
+      - id: data-upload
+        label: The attacker has uploaded data to pastebin.
+        narrative: The attacker has uploaded data to pastebin. Journalists are calling to hear what is happening
+        outcome:
+          description: Costumer personal data have been made publicly available.
+          reputation_delta: -10
+          risk_delta: -3
+  - id: supply-chain
+    title: Supply chain breach
+    prompt: Your org relies heavily on a SaaS vendor that just shipped a compromised update.
+    options:
+      - id: compromised-vendor
+        label: Once of you SaaS vendors has been compromised
+        narrative: Once of you SaaS vendors has been compromised, increasing the risk of a breach.
+        outcome:
+          description: The risk of a breach has increased.
+          risk_delta: -10
 
